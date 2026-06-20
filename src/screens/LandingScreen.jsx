@@ -1,6 +1,6 @@
 // src/screens/LandingScreen.jsx
 import Button from "../components/ui/Button";
-import TypeWriterText from "../components/ui/TypeWriterText";
+import TypeWriterText from "../components/ui/TypewriterText";
 import FloatingHearts from "../components/ui/FloatingHearts";
 
 export default function LandingScreen({

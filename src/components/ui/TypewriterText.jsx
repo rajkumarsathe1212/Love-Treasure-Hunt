@@ -1,4 +1,4 @@
-// src/components/ui/TypeWriterText.jsx
+// src/components/ui/TypewriterText.jsx
 import { Typewriter } from "react-simple-typewriter";
 
 export default function TypeWriterText({
