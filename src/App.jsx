@@ -1,122 +1,146 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useEffect, useState } from "react";
+import LoadingScreen from "./screens/LoadingScreen";
+import ResetJourneyButton from "./components/ui/ResetJourneyButton";
+import DatePickerScreen from "./screens/DatePickerScreen";
 
-function App() {
-  const [count, setCount] = useState(0)
+import LandingScreen from "./screens/LandingScreen";
+import ClueOne from "./screens/ClueOne";
+import ClueTwo from "./screens/ClueTwo";
+import ClueThree from "./screens/ClueThree";
+import PuzzleScreen from "./screens/PuzzleScreen";
+import LetterScreen from "./screens/LetterScreen";
+import ProposalScreen from "./screens/ProposalScreen";
+import SuccessScreen from "./screens/SuccessScreen";
+
+import MusicPlayer from "./components/effects/MusicPlayer";
+
+import { AnimatePresence, motion } from "framer-motion";
+
+import useJourney, { SCREENS } from "./hooks/useJourney";
+
+export default function App() {
+  const { currentScreen, goToScreen } = useJourney();
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1800);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  let screenContent;
+
+  switch (currentScreen) {
+    case SCREENS.LANDING:
+      screenContent = (
+        <LandingScreen onStart={() => goToScreen(SCREENS.CLUE_ONE)} />
+      );
+      break;
+
+    case SCREENS.CLUE_ONE:
+      screenContent = (
+        <ClueOne onSuccess={() => goToScreen(SCREENS.CLUE_TWO)} />
+      );
+      break;
+
+    case SCREENS.CLUE_TWO:
+      screenContent = (
+        <ClueTwo onSuccess={() => goToScreen(SCREENS.CLUE_THREE)} />
+      );
+      break;
+
+    case SCREENS.CLUE_THREE:
+      screenContent = (
+        <ClueThree onSuccess={() => goToScreen(SCREENS.PUZZLE)} />
+      );
+      break;
+
+    case SCREENS.PUZZLE:
+      screenContent = (
+        <PuzzleScreen onSuccess={() => goToScreen(SCREENS.LETTER)} />
+      );
+      break;
+
+    case SCREENS.LETTER:
+      screenContent = (
+        <LetterScreen onContinue={() => goToScreen(SCREENS.PROPOSAL)} />
+      );
+      break;
+
+    case SCREENS.PROPOSAL:
+      screenContent = (
+        <ProposalScreen onYes={() => goToScreen(SCREENS.DATE_PICKER)} />
+      );
+      break;
+
+    case SCREENS.DATE_PICKER:
+      screenContent = (
+        <DatePickerScreen onDateSelected={() => goToScreen(SCREENS.SUCCESS)} />
+      );
+      break;
+
+    case SCREENS.SUCCESS:
+      screenContent = <SuccessScreen />;
+      break;
+
+    default:
+      screenContent = (
+        <div className="min-h-screen flex items-center justify-center text-3xl">
+          Coming Soon ❤️
+        </div>
+      );
+  }
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
+      <MusicPlayer />
+      <ResetJourneyButton />
+
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentScreen}
+          initial={{
+            opacity: 0,
+            scale: 0.98,
+          }}
+          animate={{
+            opacity: 1,
+            scale: 1,
+          }}
+          exit={{
+            opacity: 0,
+            scale: 1.02,
+          }}
+          transition={{
+            duration: 0.4,
+          }}
         >
-          Count is {count}
-        </button>
-      </section>
+          {screenContent}
+        </motion.div>
+      </AnimatePresence>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+      <div
+        className="
+        fixed
+        bottom-3
+        left-1/2
+        -translate-x-1/2
+        text-white/70
+        text-xs
+        md:text-sm
+        z-50
+        pointer-events-none
+      "
+      >
+        Made with ❤️ by Raj
+      </div>
     </>
-  )
+  );
 }
-
-export default App
